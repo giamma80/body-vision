@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
+from app.api.endpoints.graphql_endpoint import graphql_router
 from app.api.routes import api_router
 from app.core.broker import redis_broker  # noqa: F401  # Initialize broker
 from app.core.config import settings
@@ -47,6 +48,9 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(api_router, prefix="/api")
+
+# Include GraphQL endpoint
+app.include_router(graphql_router, prefix="", tags=["graphql"])
 
 
 @app.get("/health")

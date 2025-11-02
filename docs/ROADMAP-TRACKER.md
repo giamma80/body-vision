@@ -90,14 +90,65 @@ measurements (id, session_id, body_fat_%, volume, density, mesh_url, timestamps)
 
 ---
 
-## FASE 3: GraphQL + Frontend Minimale 📋 (PLANNED)
+## FASE 3: GraphQL Schema ✅ (COMPLETED)
+
+### Completed Tasks
+
+| Task | Area | Priority | Status | Date | Note |
+|---|---|---|---|---|---|
+| Strawberry GraphQL schema | backend | medium | done | 2025-11-02 | Complete schema con 8 queries |
+| GraphQL types | backend | medium | done | 2025-11-02 | User, Session, Measurement, Stats |
+| GraphQL queries implementation | backend | medium | done | 2025-11-02 | Complex queries con relationships |
+| GraphQL endpoint integration | backend | medium | done | 2025-11-02 | FastAPI + GraphiQL UI |
+| GraphQL documentation | docs | medium | done | 2025-11-02 | Examples + Python client |
+| GraphQL tests | backend | medium | done | 2025-11-02 | Unit tests + integration |
+
+**Files Created:**
+- `backend/app/graphql/types.py` - GraphQL types (110+ lines)
+- `backend/app/graphql/queries.py` - 8 queries (315+ lines)
+- `backend/app/graphql/schema.py` - Schema definition
+- `backend/app/api/endpoints/graphql_endpoint.py` - FastAPI integration
+- `docs/GRAPHQL-EXAMPLES.md` - Complete query examples (400+ lines)
+- `scripts/test_graphql.py` - Test script
+- `backend/tests/test_graphql.py` - Unit tests
+
+**GraphQL Queries Implemented:**
+1. `user(email)` - Get user by email
+2. `userById(id)` - Get user by ID
+3. `analysisSession(jobId)` - Get session with measurements
+4. `userSessions(email, status, limit, offset)` - Get user's sessions with filters
+5. `userWithSessions(email, limit)` - User + recent sessions combined
+6. `userStats(email)` - Statistics (total, avg body fat, processing time)
+7. `latestMeasurements(email, limit)` - Latest measurements only
+
+**GraphQL Features:**
+- Fully typed schema with Strawberry
+- Automatic enum conversion (AnalysisStatus, Gender)
+- Relationship resolution (Session → Measurement)
+- Pagination support (limit/offset)
+- Filtering (by status)
+- Aggregations (count, avg)
+- GraphiQL UI at /graphql
+- Introspection enabled
+
+**Documentation:**
+- Complete query examples
+- Variables usage
+- Error handling
+- Performance tips
+- Python client example
+- curl examples
+
+---
+
+## FASE 4: Frontend (Next.js) 📋 (PLANNED)
 
 | Task | Area | Priority | Status | Note |
 |---|---|---|---|---|
-| Strawberry GraphQL schema | backend | medium | todo | Query per sessioni e misurazioni |
 | Next.js 14 setup | frontend | high | todo | App Router + TypeScript |
 | Shadcn/UI components | frontend | medium | todo | UI library setup |
 | Upload 3 foto interface | frontend | high | todo | Drag & drop o file picker |
+| GraphQL client setup | frontend | medium | todo | urql o Apollo Client |
 | Visualizzazione risultati | frontend | medium | todo | Tabella semplice (no 3D per ora) |
 
 ---
@@ -140,29 +191,41 @@ measurements (id, session_id, body_fat_%, volume, density, mesh_url, timestamps)
 
 ## Notes
 
-**Current Focus:** FASE 3 - Frontend Setup o GraphQL Schema
+**Current Focus:** FASE 4 - Frontend Setup (Next.js)
 
 **Database:** SQLite locale per sviluppo (`bodyvision.db`), PostgreSQL per produzione
 
-**Completed (FASE 1 & 2):**
-- ✅ Database models + migrations
-- ✅ Worker Dramatiq mock funzionante
-- ✅ POST /predict che accoda job e salva in DB
-- ✅ GET /predict/{job_id} che ritorna risultati
-- ✅ Test end-to-end del flusso completo
-- ✅ Redis automation con Makefile
-- ✅ Complete documentation
+**Completed (FASE 1, 2 & 3):**
+- ✅ Database models + migrations (FASE 1)
+- ✅ Worker Dramatiq mock funzionante (FASE 2)
+- ✅ POST /predict che accoda job e salva in DB (FASE 2)
+- ✅ GET /predict/{job_id} che ritorna risultati (FASE 2)
+- ✅ Test end-to-end del flusso completo (FASE 2)
+- ✅ Redis automation con Makefile (FASE 2)
+- ✅ GraphQL schema completo con Strawberry (FASE 3)
+- ✅ 8 GraphQL queries con relationships (FASE 3)
+- ✅ GraphiQL UI + documentation (FASE 3)
 
 **Next Session Goals:**
-1. Setup GraphQL schema con Strawberry
-2. Oppure: Setup Next.js 14 frontend
-3. Oppure: Supabase integration setup
+1. Setup Next.js 14 con App Router
+2. Shadcn/UI + Tailwind configuration
+3. GraphQL client (urql o Apollo)
+4. Upload interface + results display
 
-**MVP Status:** Backend completo e funzionante! 🎉
-- API REST con job queue
-- Database persistence
-- Worker background con mock results
-- Ready per frontend integration
+**Backend Status:** COMPLETO! 🎉🎉
+- ✅ REST API con job queue
+- ✅ GraphQL API con query complesse
+- ✅ Database persistence
+- ✅ Worker background con mock results
+- ✅ Redis automation
+- ✅ Complete testing + documentation
+- 🚀 **Ready per frontend integration!**
+
+**API Endpoints:**
+- REST: `/api/predict/` (POST/GET)
+- GraphQL: `/graphql` (POST) con GraphiQL UI
+- Health: `/health`
+- Docs: `/docs` (Swagger)
 
 ---
 
