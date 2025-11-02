@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from app.api.routes import api_router
+from app.core.broker import redis_broker  # noqa: F401  # Initialize broker
 from app.core.config import settings
 
 

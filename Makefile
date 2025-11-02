@@ -3,6 +3,7 @@
 # Colors for output
 BLUE := \033[0;34m
 GREEN := \033[0;32m
+YELLOW := \033[1;33m
 NC := \033[0m # No Color
 
 help: ## Show this help message
@@ -55,10 +56,57 @@ clean: ## Clean cache and temporary files
 	find . -type f -name "*.pyc" -delete
 	find . -type f -name ".coverage" -delete
 
-redis-start: ## Start Redis server
-	redis-server --daemonize yes
+redis-check: ## Check if Redis is installed
+	@command -v redis-server >/dev/null 2>&1 || { \
+		echo "$(BLUE)Redis is not installed.$(NC)"; \
+		echo "$(BLUE)Install with:$(NC)"; \
+		echo "  macOS: brew install redis"; \
+		echo "  Ubuntu: sudo apt-get install redis-server"; \
+		echo "  Or visit: https://redis.io/download"; \
+		exit 1; \
+	}
+	@echo "$(GREEN)✓ Redis is installed$(NC)"
 
-redis-stop: ## Stop Redis server
-	redis-cli shutdown
+redis-status: redis-check ## Check Redis server status
+	@redis-cli ping >/dev/null 2>&1 && \
+		echo "$(GREEN)✓ Redis is running$(NC)" || \
+		echo "$(BLUE)Redis is not running. Start with: make redis-start$(NC)"
+
+redis-start: redis-check ## Start Redis server (auto-detects platform)
+	@if redis-cli ping >/dev/null 2>&1; then \
+		echo "$(GREEN)✓ Redis is already running$(NC)"; \
+	elif command -v brew >/dev/null 2>&1 && brew services list | grep -q redis; then \
+		echo "$(BLUE)Starting Redis via Homebrew...$(NC)"; \
+		brew services start redis && sleep 1; \
+	else \
+		echo "$(BLUE)Starting Redis server...$(NC)"; \
+		redis-server --daemonize yes && sleep 1; \
+	fi
+	@make redis-status
+
+redis-stop: ## Stop Redis server (auto-detects platform)
+	@if ! redis-cli ping >/dev/null 2>&1; then \
+		echo "$(BLUE)Redis is not running$(NC)"; \
+	elif command -v brew >/dev/null 2>&1 && brew services list | grep redis | grep -q started; then \
+		echo "$(BLUE)Stopping Redis via Homebrew...$(NC)"; \
+		brew services stop redis; \
+	else \
+		echo "$(BLUE)Stopping Redis server...$(NC)"; \
+		redis-cli shutdown 2>/dev/null || true; \
+	fi
+
+redis-restart: redis-stop redis-start ## Restart Redis server
+
+worker: ## Start Dramatiq worker for background tasks
+	./scripts/start_worker.sh
+
+db-migrate: ## Create new database migration
+	alembic revision --autogenerate -m "$(MSG)"
+
+db-upgrade: ## Apply database migrations
+	alembic upgrade head
+
+db-downgrade: ## Rollback last migration
+	alembic downgrade -1
 
 .DEFAULT_GOAL := help
