@@ -55,9 +55,9 @@ class Settings(BaseSettings):
         default="your-secret-key-change-in-production",
         description="Secret key for JWT and encryption",
     )
-    ALLOWED_ORIGINS: list[str] = Field(
-        default=["http://localhost:3000", "http://localhost:8000"],
-        description="CORS allowed origins",
+    ALLOWED_ORIGINS: str = Field(
+        default="http://localhost:3000,http://localhost:8000",
+        description="CORS allowed origins (comma-separated)",
     )
 
     # ML / Inference
@@ -65,13 +65,9 @@ class Settings(BaseSettings):
     ENABLE_GPU: bool = False
     TORCH_DEVICE: Literal["cpu", "cuda", "mps"] = "cpu"
 
-    @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
-        """Parse CORS origins from string or list."""
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+    def get_allowed_origins(self) -> list[str]:
+        """Parse CORS origins from comma-separated string."""
+        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
 
 
 # Global settings instance
